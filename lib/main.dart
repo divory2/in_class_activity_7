@@ -193,7 +193,7 @@ class _FadingTextAnimationState extends State<FadingTextAnimation> {
                             )
                           : null,
                       child: Image.asset(
-                        'assets/images/image2.png', // Make sure the image exists in your assets.
+                        'assets/images/image2.png',
                         width: 150,
                         height: 150,
                         fit: BoxFit.cover,
@@ -205,7 +205,7 @@ class _FadingTextAnimationState extends State<FadingTextAnimation> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      _rotationTurns += 0.25; // rotates 90° per tap.
+                      _rotationTurns += 0.25; // Rotates 90° per tap.
                     });
                   },
                   child: Text('Rotate Image'),
