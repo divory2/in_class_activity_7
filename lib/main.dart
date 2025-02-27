@@ -58,38 +58,31 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: _themeMode,
-      home: Builder(
-        builder: (context) => FadingTextAnimation(
-          toggleTheme: _toggleTheme,
-          showColorPicker: () => showColorPicker(context),
-          selectedColor: selectedColor,
-        ),
+      home: HomePage(
+        toggleTheme: _toggleTheme,
+        showColorPicker: () => showColorPicker,
+        selectedColor: selectedColor,
       ),
     );
   }
 }
 
-class FadingTextAnimation extends StatefulWidget {
+class HomePage extends StatefulWidget {
   final VoidCallback toggleTheme;
   final VoidCallback showColorPicker;
   final Color selectedColor;
 
-  FadingTextAnimation({
+  HomePage({
     required this.toggleTheme,
     required this.showColorPicker,
     required this.selectedColor,
   });
 
   @override
-  _FadingTextAnimationState createState() => _FadingTextAnimationState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _FadingTextAnimationState extends State<FadingTextAnimation> {
-  bool _isVisible = true;
-  bool _showFrame = true;
-  double _rotationTurns = 0;
-  String _displayText = "Hello, Flutter!";
-
+class _HomePageState extends State<HomePage> {
   final _controller = PageController(initialPage: 0);
 
   @override
@@ -98,19 +91,13 @@ class _FadingTextAnimationState extends State<FadingTextAnimation> {
     super.dispose();
   }
 
-  void toggleVisibility() {
-    setState(() {
-      _isVisible = !_isVisible;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Fading Text Animation'),
+        title: Text('Swipe Between Pages'),
         actions: [
           IconButton(
             icon: Icon(isDark ? Icons.sunny : Icons.mode_night),
@@ -122,129 +109,139 @@ class _FadingTextAnimationState extends State<FadingTextAnimation> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // PageView wrapped properly
-                SizedBox(
-                  height: 200, // Define a height to prevent layout issues
-                  child: PageView(
-                    controller: _controller,
-                    children: [
-                      Page1(),
-                      Page2(),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20),
-                AnimatedOpacity(
-                  opacity: _isVisible ? 1.0 : 0.0,
-                  duration: Duration(seconds: 2),
-                  curve: Curves.easeInOut,
-                  child: Text(
-                    _displayText,
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: widget.selectedColor,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: toggleVisibility,
-                  child: Text('Toggle Text Visibility'),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _displayText = _displayText == 'Hello, Flutter!'
-                          ? 'Welcome to Flutter!'
-                          : 'Hello, Flutter!';
-                    });
-                  },
-                  child: Text('Change Text'),
-                ),
-                SizedBox(height: 40),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Show Frame'),
-                    Switch(
-                      value: _showFrame,
-                      onChanged: (value) {
-                        setState(() {
-                          _showFrame = value;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20),
-                AnimatedRotation(
-                  turns: _rotationTurns,
-                  duration: Duration(seconds: 2),
-                  curve: Curves.easeInOut,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      decoration: _showFrame
-                          ? BoxDecoration(
-                              border: Border.all(
-                                color: Colors.black,
-                                width: 3,
-                              ),
-                            )
-                          : null,
-                      child: Image.asset(
-                        'assets/images/image2.png',
-                        width: 150,
-                        height: 150,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _rotationTurns += 0.25; // Rotates 90° per tap.
-                    });
-                  },
-                  child: Text('Rotate Image'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: toggleVisibility,
-        child: Icon(Icons.play_arrow),
+      body: PageView(
+        controller: _controller,
+        children: [
+          Page1(),
+          Page2(),
+          Page3(selectedColor: widget.selectedColor), // Third page with dynamic color
+        ],
       ),
     );
   }
 }
 
 class Page1 extends StatelessWidget {
-  const Page1({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Hello new page'));
+    return Center(
+      child: Text(
+        'Page 1',
+        style: TextStyle(fontSize: 24),
+      ),
+    );
   }
 }
 
 class Page2 extends StatelessWidget {
-  const Page2({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        'Page 2',
+        style: TextStyle(fontSize: 24),
+      ),
+    );
+  }
+}
+
+class Page3 extends StatefulWidget {
+  final Color selectedColor;
+  Page3({required this.selectedColor});
+
+  @override
+  _Page3State createState() => _Page3State();
+}
+
+class _Page3State extends State<Page3> {
+  bool _isVisible = true;
+  double _rotationTurns = 0;
+  String _displayText = "Hello, Flutter!";
+  bool _showFrame = true;
+
+  void toggleVisibility() {
+    setState(() {
+      _isVisible = !_isVisible;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Hello new page 2'));
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedOpacity(
+            opacity: _isVisible ? 1.0 : 0.0,
+            duration: Duration(seconds: 2),
+            child: Text(
+              _displayText,
+              style: TextStyle(fontSize: 24, color: widget.selectedColor),
+            ),
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: toggleVisibility,
+            child: Text('Toggle Text Visibility'),
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _displayText = _displayText == 'Hello, Flutter!'
+                    ? 'Welcome to Flutter!'
+                    : 'Hello, Flutter!';
+              });
+            },
+            child: Text('Change Text'),
+          ),
+          SizedBox(height: 40),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Show Frame'),
+              Switch(
+                value: _showFrame,
+                onChanged: (value) {
+                  setState(() {
+                    _showFrame = value;
+                  });
+                },
+              ),
+            ],
+          ),
+          SizedBox(height: 20),
+          AnimatedRotation(
+            turns: _rotationTurns,
+            duration: Duration(seconds: 2),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                decoration: _showFrame
+                    ? BoxDecoration(
+                        border: Border.all(color: Colors.black, width: 3),
+                      )
+                    : null,
+                child: Image.asset(
+                  'assets/images/image2.png',
+                  width: 150,
+                  height: 150,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _rotationTurns += 0.25;
+              });
+            },
+            child: Text('Rotate Image'),
+          ),
+        ],
+      ),
+    );
   }
 }
