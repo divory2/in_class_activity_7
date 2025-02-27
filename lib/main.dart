@@ -11,12 +11,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // Manage current theme mode.
   ThemeMode _themeMode = ThemeMode.system;
-  // Default color.
   Color selectedColor = Colors.blue;
 
-  // Toggle theme.
   void _toggleTheme() {
     setState(() {
       _themeMode =
@@ -24,7 +21,6 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  // Show color picker dialog, accepts a BuildContext.
   void showColorPicker(BuildContext context) {
     showDialog(
       context: context,
@@ -59,13 +55,9 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      // Light theme.
       theme: ThemeData.light(),
-      // Dark theme.
       darkTheme: ThemeData.dark(),
-      // Apply theme.
       themeMode: _themeMode,
-      // Use a Builder to obtain a BuildContext that is below MaterialApp.
       home: Builder(
         builder: (context) => FadingTextAnimation(
           toggleTheme: _toggleTheme,
@@ -97,35 +89,26 @@ class _FadingTextAnimationState extends State<FadingTextAnimation> {
   bool _showFrame = true;
   double _rotationTurns = 0;
   String _displayText = "Hello, Flutter!";
-  
+
+  final _controller = PageController(initialPage: 0);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   void toggleVisibility() {
     setState(() {
       _isVisible = !_isVisible;
     });
   }
-  
-    
-     final _controller = PageController(
-      initialPage: 0,
-     );
-  
-
-  @override
-void dispose() {
-  _controller.dispose();
-  super.dispose();
-}
-  
-
 
   @override
   Widget build(BuildContext context) {
-    // Check current brightness to choose icon.
     bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      
-     
       appBar: AppBar(
         title: Text('Fading Text Animation'),
         actions: [
@@ -139,22 +122,129 @@ void dispose() {
           ),
         ],
       ),
-      body: Center(
-        child: AnimatedOpacity(
-          opacity: _isVisible ? 1.0 : 0.0,
-          duration: Duration(seconds: 1),
-          child: Text(
-            'Hello, Flutter!',
-            style: TextStyle(fontSize: 24),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // PageView wrapped properly
+                SizedBox(
+                  height: 200, // Define a height to prevent layout issues
+                  child: PageView(
+                    controller: _controller,
+                    children: [
+                      Page1(),
+                      Page2(),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+                AnimatedOpacity(
+                  opacity: _isVisible ? 1.0 : 0.0,
+                  duration: Duration(seconds: 2),
+                  curve: Curves.easeInOut,
+                  child: Text(
+                    _displayText,
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: widget.selectedColor,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: toggleVisibility,
+                  child: Text('Toggle Text Visibility'),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _displayText = _displayText == 'Hello, Flutter!'
+                          ? 'Welcome to Flutter!'
+                          : 'Hello, Flutter!';
+                    });
+                  },
+                  child: Text('Change Text'),
+                ),
+                SizedBox(height: 40),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Show Frame'),
+                    Switch(
+                      value: _showFrame,
+                      onChanged: (value) {
+                        setState(() {
+                          _showFrame = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                AnimatedRotation(
+                  turns: _rotationTurns,
+                  duration: Duration(seconds: 2),
+                  curve: Curves.easeInOut,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      decoration: _showFrame
+                          ? BoxDecoration(
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 3,
+                              ),
+                            )
+                          : null,
+                      child: Image.asset(
+                        'assets/images/image2.png',
+                        width: 150,
+                        height: 150,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _rotationTurns += 0.25; // Rotates 90° per tap.
+                    });
+                  },
+                  child: Text('Rotate Image'),
+                ),
+              ],
+            ),
           ),
         ),
-        ], 
-        
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: toggleVisibility,
         child: Icon(Icons.play_arrow),
       ),
     );
+  }
+}
+
+class Page1 extends StatelessWidget {
+  const Page1({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Text('Hello new page'));
+  }
+}
+
+class Page2 extends StatelessWidget {
+  const Page2({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Text('Hello new page 2'));
   }
 }
