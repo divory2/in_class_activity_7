@@ -94,6 +94,9 @@ class FadingTextAnimation extends StatefulWidget {
 
 class _FadingTextAnimationState extends State<FadingTextAnimation> {
   bool _isVisible = true;
+  bool _showFrame = true;
+  double _rotationTurns = 0;
+  String _displayText = "Hello, Flutter!";
 
   void toggleVisibility() {
     setState(() {
@@ -120,15 +123,94 @@ class _FadingTextAnimationState extends State<FadingTextAnimation> {
           ),
         ],
       ),
-      body: Center(
-        child: AnimatedOpacity(
-          opacity: _isVisible ? 1.0 : 0.0,
-          duration: Duration(seconds: 1),
-          child: Text(
-            'Hello, Flutter!',
-            style: TextStyle(
-              fontSize: 24,
-              color: widget.selectedColor,
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Animated text with a fading effect.
+                AnimatedOpacity(
+                  opacity: _isVisible ? 1.0 : 0.0,
+                  duration: Duration(seconds: 2),
+                  curve: Curves.easeInOut,
+                  child: Text(
+                    _displayText,
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: widget.selectedColor,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: toggleVisibility,
+                  child: Text('Toggle Text Visibility'),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _displayText = _displayText == 'Hello, Flutter!'
+                          ? 'Welcome to Flutter!'
+                          : 'Hello, Flutter!';
+                    });
+                  },
+                  child: Text('Change Text'),
+                ),
+                SizedBox(height: 40),
+                // Toggle switch to enable/disable image frame.
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Show Frame'),
+                    Switch(
+                      value: _showFrame,
+                      onChanged: (value) {
+                        setState(() {
+                          _showFrame = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                // Rotating image with rounded corners.
+                AnimatedRotation(
+                  turns: _rotationTurns,
+                  duration: Duration(seconds: 2),
+                  curve: Curves.easeInOut,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      decoration: _showFrame
+                          ? BoxDecoration(
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 3,
+                              ),
+                            )
+                          : null,
+                      child: Image.asset(
+                        'assets/images/image2.png', // Make sure the image exists in your assets.
+                        width: 150,
+                        height: 150,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _rotationTurns += 0.25; // rotates 90° per tap.
+                    });
+                  },
+                  child: Text('Rotate Image'),
+                ),
+              ],
             ),
           ),
         ),
