@@ -22,8 +22,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   void showColorPicker(BuildContext context) {
-    showDialog(
-      context: context,
+  showDialog(
+    context: context,
+    builder: (context) => Builder( 
       builder: (context) => AlertDialog(
         title: Text('Select Color'),
         content: SingleChildScrollView(
@@ -37,7 +38,7 @@ class _MyAppState extends State<MyApp> {
             labelTypes: const [
               ColorLabelType.rgb,
               ColorLabelType.hsv,
-              ColorLabelType.hsl
+              ColorLabelType.hsl,
             ],
             pickerAreaHeightPercent: 0.8,
           ),
@@ -49,22 +50,27 @@ class _MyAppState extends State<MyApp> {
           )
         ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      themeMode: _themeMode,
-      home: HomePage(
+  return MaterialApp(
+    theme: ThemeData.light(),
+    darkTheme: ThemeData.dark(),
+    themeMode: _themeMode,
+    // Wrap HomePage in a Builder to get a proper context
+    home: Builder(
+      builder: (context) => HomePage(
         toggleTheme: _toggleTheme,
-        showColorPicker: () => showColorPicker,
+        showColorPicker: () => showColorPicker(context),
         selectedColor: selectedColor,
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 class HomePage extends StatefulWidget {
